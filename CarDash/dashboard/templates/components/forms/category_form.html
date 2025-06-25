@@ -1,0 +1,6 @@
+<h2 class="text-xl font-bold">Créer une categorie</h2>
+<form method="post" class="mb-6">
+    {% csrf_token %}
+    {{ category_form.as_p }}
+    <button name="submit_category" class="bg-blue-500 text-white px-4 py-2 rounded">Ajouter</button>
+</form>

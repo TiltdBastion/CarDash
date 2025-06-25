@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %} font-mono">
+    <head>
+        <title>OdoDash</title>
+
+        {% load static %}
+
+        <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+        <link href="https://cdn.materialdesignicons.com/6.6.96/css/materialdesignicons.min.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="{% if request.COOKIES.theme == 'dark' %}bg-gray-800 text-gray-200{% endif %}">
+        {% include "components/navbar.html" %}
+
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-2xl font-bold mt-12">Login</h1>
+
+            {% if forms.errors %}
+                <p style="color:red">Nom d'utilisateur ou mot de passe invalide</p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Connexion</button>
+            </form>
+        </div>
+    </body>
+</html>
