@@ -1,12 +1,11 @@
 <nav class="p-4 flex justify-between items-center bg-white dark:bg-gray-900 shadow text-white">
     <div class="text-xl font-bold">
-        <a href="home">OdoDash</a>
+        <a href="">OdoDash</a>
     </div>
 
     <div class="mr-auto ml-4">
         {% if user.is_authenticated %}
-            <a href="{% url 'home' %}" class="hover:underline">Accueil</a>
-            <a href="{% url 'config' %}" class="hover:underline">Configuration</a>
+            <a href="{% url 'vehicle_selection' %}" class="hover:underline">Accueil</a>
         {% else %}
             <a href="{% url 'login' %}">Connexion</a>
         {% endif %}

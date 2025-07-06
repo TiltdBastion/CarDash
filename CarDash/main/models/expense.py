@@ -5,6 +5,9 @@ class ExpenseQuerySet(models.QuerySet):
     def for_car(self, car):
         return self.filter(car=car)
 
+    def for_car_id(self, car_id):
+        return self.filter(car_id=car_id)
+
 class Expense(models.Model):
     date = models.DateField()
     category = models.ForeignKey('Category', on_delete=models.PROTECT)
