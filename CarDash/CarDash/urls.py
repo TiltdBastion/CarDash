@@ -19,10 +19,8 @@ from django.urls import path, include
 from django.shortcuts import redirect
 def redirect_if_not_auth(request):
     if request.user.is_authenticated:
-        print("authenticated")
-        return redirect('home')
+        return redirect('vehicle_selection')
     else:
-        print("not authenticated")
         return redirect('login')
 urlpatterns = [
     path('admin/', admin.site.urls),
