@@ -18,7 +18,7 @@ def vehicle_selection_view(request):
             selected_car = form.cleaned_data['car']
             return redirect('dashboard', selected_car.id)
 
-    return render(request, 'car_selection.html', { 'form' : form})
+    return render(request, 'car_selection.html', { 'form' : form })
 
 
 @login_required
