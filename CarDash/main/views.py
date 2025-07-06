@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.db.models import Sum
-from .models import Mileage, Expense, Category
-from .forms import MileageForm, ExpenseForm, CategoryForm
+from .models import Mileage, Expense, Car
+from .forms import MileageForm, ExpenseForm, CategoryForm, VehicleSelectionForm
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 import json
@@ -11,11 +11,11 @@ from django.contrib.auth import logout
 
 @login_required
 def home_view(request):
-    car = request.user.car
-    ordered_mileage = Mileage.get_ordered_mileage()
+    car = Car.objects.for_user(request.user).first()
+    ordered_mileage = Mileage.objects.for_car(car).order_by('-date')
 
     latest_mileage = ordered_mileage.first()
-    expenses = Expense.objects.order_by('-date')[:10]
+    expenses = Expense.objects.filter(car=car).order_by('-date')[:10]
     
     odo_data = ordered_mileage.values('date', 'odometer')
     odo_chart_data = json.dumps(list(odo_data), cls=DjangoJSONEncoder)

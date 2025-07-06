@@ -16,11 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic.base import RedirectView
-
+from django.shortcuts import redirect
+def redirect_if_not_auth(request):
+    if request.user.is_authenticated:
+        print("authenticated")
+        return redirect('home')
+    else:
+        print("not authenticated")
+        return redirect('login')
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('customauth.urls')),
-    path('', RedirectView.as_view(pattern_name='home', permanent=False)),
-    path('home/', include('dashboard.urls')),
+    path('', redirect_if_not_auth, name='root'),
+    path('auth/', include('customauth.urls'), name='login'),
+    path('home/', include('main.urls'), name='home'),
 ]

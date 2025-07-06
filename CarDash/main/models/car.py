@@ -15,4 +15,7 @@ class Car(models.Model):
 
     objects = CarQuerySet.as_manager()
 
+    def __str__(self):
+        return self.license_plate
+
 
