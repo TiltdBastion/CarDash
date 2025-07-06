@@ -11,11 +11,13 @@ from django.contrib.auth import logout
 
 @login_required
 def home_view(request):
-    print(request.user.is_authenticated)
-    latest_mileage = Mileage.objects.order_by('-date').first()
-    expenses = Expense.objects.order_by('-date')[:10]    
+    car = request.user.car
+    ordered_mileage = Mileage.get_ordered_mileage()
+
+    latest_mileage = ordered_mileage.first()
+    expenses = Expense.objects.order_by('-date')[:10]
     
-    odo_data = Mileage.objects.order_by('date').values('date', 'odometer')
+    odo_data = ordered_mileage.values('date', 'odometer')
     odo_chart_data = json.dumps(list(odo_data), cls=DjangoJSONEncoder)
 
     expense_by_category = (
