@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}OdoDash{% endblock %}</title>
+
+    {% load static %}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.materialdesignicons.com/6.6.96/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% if request.COOKIES.theme == 'dark' %}bg-gray-800 text-gray-200{% endif %}">
+    {% include 'components/navbar.html' %}
+
+    <main class="container mx-auto p-4">
+        {% block content %}
+
+        {% endblock %}
+    </main>
+</body>
+</html>

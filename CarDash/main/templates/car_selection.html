@@ -1,35 +1,18 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-                <title>OdoDash</title>
+{% extends 'base.html' %}
 
-            {% load static %}
-
-            <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-            <link href="https://cdn.materialdesignicons.com/6.6.96/css/materialdesignicons.min.css" rel="stylesheet">
-            <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="{% if request.COOKIES.theme == 'dark' %}bg-gray-800 text-gray-200{% endif %}">
-
-        {% include 'components/navbar.html' %}
-
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-2xl font-bold mt-12">Selection du vehicule</h1>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                {% for choice in form.fields.car.queryset %}
-                    <form method="post" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="car" value="{{ choice.id }}">
-                        <button type="submit" name="submit_category" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-200">
-                            {{ choice }}
-                        </button>
-                    </form>
-                {% endfor %}
-            </div>
-
-        </form>
-    </div>
-
-    </body>
-</html>
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mt-12">Selection du vehicule</h1>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+            {% for choice in form.fields.car.queryset %}
+                <form method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="car" value="{{ choice.id }}">
+                    <button type="submit" name="submit_category" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ choice }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}

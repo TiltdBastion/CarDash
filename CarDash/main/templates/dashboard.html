@@ -1,144 +1,134 @@
-<!DOCTYPE html>
-<html class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %} font-mono">
-    <head>
-        <title>OdoDash</title>
+{% extends 'base.html' %}
 
-        {% load static %}
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+{% endblock %}
 
-        <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-        <link href="https://cdn.materialdesignicons.com/6.6.96/css/materialdesignicons.min.css" rel="stylesheet">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    </head>
-    <body class="{% if request.COOKIES.theme == 'dark' %}bg-gray-800 text-gray-200{% endif %}">
+{% block content %}
+<div class="max-w-6xl mx-auto ">
+    <h1 class="text-2xl font-bold mt-12">Kilometrage: {{ mileage.odometer }} km</h1>
 
-        {% include "components/navbar.html" %}
+    <canvas id="odoChart"></canvas>
 
-        <div class="max-w-6xl mx-auto ">
-            <h1 class="text-2xl font-bold mt-12">Kilometrage: {{ mileage.odometer }} km</h1>
-
-            <canvas id="odoChart"></canvas>
-
-            <div class="grid grid-cols-3 mt-12">
-                <div class="col-span-1">
-                    <h2 class="text-xl font-bold mt-4">Dépenses recentes</h2>
-                    <ul class="mb-4">
-                        {% for e in expenses %}
-                            <li>{{ e.date }} - {{ e.category }}: €{{ e.amount }} {% if e.note %}({{ e.note }}){% endif %}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <div class="col-span-2 mx-48">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-            </div>
+    <div class="grid grid-cols-3 mt-12">
+        <div class="col-span-1">
+            <h2 class="text-xl font-bold mt-4">Dépenses recentes</h2>
+            <ul class="mb-4">
+                {% for e in expenses %}
+                    <li>{{ e.date }} - {{ e.category }}: €{{ e.amount }} {% if e.note %}({{ e.note }}){% endif %}</li>
+                {% endfor %}
+            </ul>
         </div>
 
-        <script defer>
-            function getChartTextColor() {
-                return document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000';
-            }
+        <div class="col-span-2 mx-48">
+            <canvas id="expenseChart"></canvas>
+        </div>
+    </div>
+</div>
 
-            const aimedOdo = [{x: new Date('06-14-2024').getTime(), y: 3900}, {x: new Date('06-14-2027').getTime(), y: 35000}];
-            const odoData = JSON.parse('{{ odo_chart_data|escapejs }}');
-            const ctx = document.getElementById('odoChart').getContext('2d');
+<script defer>
+    function getChartTextColor() {
+        return document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000';
+    }
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Kilometrage',
-                            data: odoData.map(d => ({
-                                x: new Date(d.date).getTime(),
-                                y: d.odometer
-                            })),
-                            borderColor: 'orange',
-                            tension: 0.1,
-                        },
-                        {
-                            label: 'Kilometrage previsionnel',
-                            data: aimedOdo,
-                            borderColor: 'grey',
-                            tension: 0.2,
-                            borderWidth:1,
-                        }
-                ]
+    const aimedOdo = [{x: new Date('06-14-2024').getTime(), y: 3900}, {x: new Date('06-14-2027').getTime(), y: 35000}];
+    const odoData = JSON.parse('{{ odo_chart_data|escapejs }}');
+    const ctx = document.getElementById('odoChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'Kilometrage',
+                    data: odoData.map(d => ({
+                        x: new Date(d.date).getTime(),
+                        y: d.odometer
+                    })),
+                    borderColor: 'orange',
+                    tension: 0.1,
                 },
-                options: {
-                    parsing: false,
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'pp',
-                                displayFormats: {
-                                    day: 'MMM d',
-                                    month: 'MMM yyyy'
-                                },
-                            },
-                            ticks: { 
-                                color: getChartTextColor() 
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date',
-                                color: getChartTextColor(),
-                            },
-                            grid: { 
-                                color: 'rgba(128, 128, 128, 0.1)' 
-                            }
+                {
+                    label: 'Kilometrage previsionnel',
+                    data: aimedOdo,
+                    borderColor: 'grey',
+                    tension: 0.2,
+                    borderWidth:1,
+                }
+        ]
+        },
+        options: {
+            parsing: false,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'pp',
+                        displayFormats: {
+                            day: 'MMM d',
+                            month: 'MMM yyyy'
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Kilometrage (km)',
-                                color: getChartTextColor(),
-                            },
-                            ticks: { 
-                                color: getChartTextColor() 
-                            },
-                            grid: { 
-                                color: 'rgba(128, 128, 128, 0.1)' 
-                            }
-                        }
                     },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: getChartTextColor(),
-                            }
-                        }
+                    ticks: {
+                        color: getChartTextColor()
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date',
+                        color: getChartTextColor(),
+                    },
+                    grid: {
+                        color: 'rgba(128, 128, 128, 0.1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Kilometrage (km)',
+                        color: getChartTextColor(),
+                    },
+                    ticks: {
+                        color: getChartTextColor()
+                    },
+                    grid: {
+                        color: 'rgba(128, 128, 128, 0.1)'
                     }
                 }
-            });
-
-            const expenseData = JSON.parse('{{ expenses_chart_data|escapejs }}');
-
-            new Chart(document.getElementById('expenseChart').getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: expenseData.labels,
-                    datasets: [{
-                        data: expenseData.data,
-                        borderWidth: 1,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: getChartTextColor(),
-                            }
-                        }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: getChartTextColor(),
                     }
-                },
-                
-            });
-        </script>
-    </body>
-</html>
+                }
+            }
+        }
+    });
+
+    const expenseData = JSON.parse('{{ expenses_chart_data|escapejs }}');
+
+    new Chart(document.getElementById('expenseChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: expenseData.labels,
+            datasets: [{
+                data: expenseData.data,
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: getChartTextColor(),
+                    }
+                }
+            }
+        },
+
+    });
+</script>
+{% endblock %}
