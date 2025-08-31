@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.db.models import Sum
-from .models import Mileage, Expense, Car
+from .models import Mileage, Expense
 from .forms import MileageForm, ExpenseForm, CategoryForm, VehicleSelectionForm
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 import json
 
 from django.contrib.auth import logout
+
 
 @login_required
 def vehicle_selection_view(request):
@@ -18,7 +19,7 @@ def vehicle_selection_view(request):
             selected_car = form.cleaned_data['car']
             return redirect('dashboard', selected_car.id)
 
-    return render(request, 'car_selection.html', { 'form' : form })
+    return render(request, 'car_selection.html', {'form': form})
 
 
 @login_required
@@ -27,7 +28,7 @@ def dashboard_view(request, car_id):
 
     latest_mileage = ordered_mileage.first()
     expenses = Expense.objects.for_car_id(car_id).order_by('-date')[:10]
-    
+
     odo_data = ordered_mileage.values('date', 'odometer')
     odo_chart_data = json.dumps(list(odo_data), cls=DjangoJSONEncoder)
 
@@ -43,12 +44,37 @@ def dashboard_view(request, car_id):
         'data': [float(item['total']) for item in expense_by_category]
     }, cls=DjangoJSONEncoder)
 
+    expense_form = ExpenseForm(request.POST or None, prefix='expense', user=request.user)
+    mileage_form = MileageForm(request.POST or None, prefix='mileage')
+    category_form = CategoryForm(request.POST or None, prefix='category')
+
+    if request.method == 'POST':
+        if 'submit_expense' in request.POST and expense_form.is_valid():
+            expense = expense_form.save(commit=False)
+            expense.car_id = car_id
+            expense.save()
+            return redirect(request.path)
+        if 'submit_mileage' in request.POST and mileage_form.is_valid():
+            mileage = mileage_form.save(commit=False)
+            mileage.car_id = car_id
+            mileage.save()
+            return redirect(request.path)
+        if 'submit_category' in request.POST and category_form.is_valid():
+            category = category_form.save(commit=False)
+            category.user = request.user
+            category.save()
+            return redirect(request.path)
+
     return render(request, 'dashboard.html', {
         'mileage': latest_mileage,
         'expenses': expenses,
         'odo_chart_data': odo_chart_data,
         'expenses_chart_data': expenses_chart_data,
+        'expense_form': expense_form,
+        'mileage_form': mileage_form,
+        'category_form': category_form,
     })
+
 
 @login_required
 def config_view(request, car_id):
@@ -78,6 +104,7 @@ def config_view(request, car_id):
         'mileage_form': mileage_form,
         'category_form': category_form,
     })
+
 
 @login_required
 def logout_view(request):

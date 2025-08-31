@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 {% endblock %}
 
 {% block content %}
@@ -11,14 +11,81 @@
 
     <canvas id="odoChart"></canvas>
 
+    <button id="toggleMileageFormBtn" class="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Ajouter un kilometrage
+    </button>
+
+    <div id="mileageForm" class="hidden mt-4">
+        <form method="post" class="mb-6">
+            {% csrf_token %}
+            {% for field in mileage_form %}
+            <div>
+                <!-- Label -->
+                <label for="{{ field.id_for_label }}"
+                       class="block text-sm font-medium mb-1">
+                    {{ field.label }}
+                </label>
+
+                <!-- Input -->
+                {{ field }}
+
+                <!-- Help text -->
+                {% if field.help_text %}
+                <p class="text-xs text-gray-400 dark:text-gray-500">
+                    {{ field.help_text }}
+                </p>
+                {% endif %}
+
+                <!-- Errors -->
+                {% for error in field.errors %}
+                <p class="text-xs text-red-500">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" name="submit_mileage" class="group relative justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2">Ajouter</button>
+            <button type="reset" id="cancelMileage" class="group relative justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-2">Annuler</button>
+        </form>
+    </div>
+
     <div class="grid grid-cols-3 mt-12">
         <div class="col-span-1">
             <h2 class="text-xl font-bold mt-4">Dépenses recentes</h2>
             <ul class="mb-4">
                 {% for e in expenses %}
-                    <li>{{ e.date }} - {{ e.category }}: €{{ e.amount }} {% if e.note %}({{ e.note }}){% endif %}</li>
+                <li>{{ e.date }} - {{ e.category }}: €{{ e.amount }} {% if e.note %}({{ e.note }}){% endif %}</li>
                 {% endfor %}
             </ul>
+            <button id="toggleExpenseFormBtn" class="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Ajouter une dépense
+            </button>
+
+            <div id="expenseForm" class="hidden mt-4">
+                <form method="post" class="mb-6">
+                    {% csrf_token %}
+                    {% for field in expense_form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}"
+                               class="block text-sm font-medium mb-1">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                        <p class="text-xs text-gray-400 dark:text-gray-500">
+                            {{ field.help_text }}
+                        </p>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                        <p class="text-xs text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" name="submit_expense" class="group relative justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2">Ajouter</button>
+                    <button type="reset" id="cancelExpense" class="group relative justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-2">Annuler</button>
+                </form>
+            </div>
         </div>
 
         <div class="col-span-2 mx-48">
@@ -32,7 +99,13 @@
         return document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000';
     }
 
-    const aimedOdo = [{x: new Date('06-14-2024').getTime(), y: 3900}, {x: new Date('06-14-2027').getTime(), y: 35000}];
+    const aimedOdo = [{
+            x: new Date('06-14-2024').getTime(),
+            y: 3900
+        }, {
+            x: new Date('06-14-2027').getTime(),
+            y: 35000
+        }];
     const odoData = JSON.parse('{{ odo_chart_data|escapejs }}');
     const ctx = document.getElementById('odoChart').getContext('2d');
 
@@ -54,9 +127,9 @@
                     data: aimedOdo,
                     borderColor: 'grey',
                     tension: 0.2,
-                    borderWidth:1,
+                    borderWidth: 1,
                 }
-        ]
+            ]
         },
         options: {
             parsing: false,
@@ -128,7 +201,39 @@
                 }
             }
         },
-
     });
 </script>
+
+<script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+        const expenseButton = document.getElementById("toggleExpenseFormBtn");
+        const expenseForm = document.getElementById("expenseForm")
+        const cancelExpenseButton = document.getElementById("cancelExpense");
+
+        expenseButton.addEventListener("click", function () {
+            expenseForm.classList.toggle("hidden");
+            expenseButton.classList.toggle("hidden");
+        })
+
+        cancelExpenseButton.addEventListener("click", function () {
+            expenseForm.classList.toggle("hidden");
+            expenseButton.classList.toggle("hidden");
+        })
+
+        const mileageButton = document.getElementById("toggleMileageFormBtn");
+        const mileageForm = document.getElementById("mileageForm")
+        const cancelMileageButton = document.getElementById("cancelMileage");
+
+        mileageButton.addEventListener("click", function () {
+            mileageForm.classList.toggle("hidden");
+            mileageButton.classList.toggle("hidden");
+        })
+
+        cancelMileageButton.addEventListener("click", function () {
+            mileageForm.classList.toggle("hidden");
+            mileageButton.classList.toggle("hidden");
+        })
+    })
+</script>
+
 {% endblock %}
