@@ -5,34 +5,31 @@
 
     <div class="mr-auto ml-4">
         {% if user.is_authenticated %}
-            <a href="{% url 'vehicle_selection' %}" class="hover:underline">Accueil</a>
+        <a href="{% url 'vehicle_selection' %}" class="hover:underline">Accueil</a>
         {% else %}
-            <a href="{% url 'login' %}">Connexion</a>
+        <a href="{% url 'login' %}">Connexion</a>
         {% endif %}
     </div>
-  
+
     <div class="flex items-center gap-6">
         {% if user.is_authenticated %}
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Logout</button>
-            </form>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
         {% endif %}
 
-
-        <button id="theme-toggle">
-            <i class="mdi mdi-theme-light-dark text-2xl"></i>
-        </button>        
     </div>
 
     <script>
-        const toggle = document.getElementById('theme-toggle');
-        toggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.classList.toggle('dark') ? 'dark' : 'light';
+            const toggle = document.getElementById('theme-toggle');
+            toggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.classList.toggle('dark') ? 'dark' : 'light';
 
-        document.cookie = `theme=${currentTheme}; path=/; max-age=31536000`;
-        location.reload();
-    });
+                document.cookie = `theme=${
+        currentTheme
+        }; path=/; max-age=31536000`;
+                location.reload();
+            });
     </script>
 </nav>
-  

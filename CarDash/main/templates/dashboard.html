@@ -95,10 +95,6 @@
 </div>
 
 <script defer>
-    function getChartTextColor() {
-        return document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000';
-    }
-
     const aimedOdo = [{
             x: new Date('06-14-2024').getTime(),
             y: 3900
@@ -145,12 +141,12 @@
                         },
                     },
                     ticks: {
-                        color: getChartTextColor()
+                        color: '#ffffff'
                     },
                     title: {
                         display: true,
                         text: 'Date',
-                        color: getChartTextColor(),
+                        color: '#ffffff',
                     },
                     grid: {
                         color: 'rgba(128, 128, 128, 0.1)'
@@ -160,10 +156,10 @@
                     title: {
                         display: true,
                         text: 'Kilometrage (km)',
-                        color: getChartTextColor(),
+                        color: '#ffffff',
                     },
                     ticks: {
-                        color: getChartTextColor()
+                        color: '#ffffff'
                     },
                     grid: {
                         color: 'rgba(128, 128, 128, 0.1)'
@@ -173,7 +169,7 @@
             plugins: {
                 legend: {
                     labels: {
-                        color: getChartTextColor(),
+                        color: '#ffffff',
                     }
                 }
             }
@@ -196,7 +192,7 @@
             plugins: {
                 legend: {
                     labels: {
-                        color: getChartTextColor(),
+                        color: '#ffffff',
                     }
                 }
             }
