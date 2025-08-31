@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  db:
+  postgres:
     image: postgres:15
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
@@ -13,3 +11,16 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
