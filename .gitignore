@@ -3,7 +3,9 @@
 .idea/
 
 *.sqlite3
-/.env
+.env
+**/.env*
+!.env.example
 
 # Ignore Python cache
 __pycache__/
